@@ -11,6 +11,19 @@ x-deploy: &x-default-deploy
     delay: 5s
     max_attempts: 3
     window: 120s
+  rollback_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+    monitor: 60s
+    max_failure_ratio: 0.3
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: rollback
+    monitor: 60s
+    max_failure_ratio: 0.3
+    order: stop-first
   resources:
     limits:
       cpus: '0.50'
@@ -33,5 +46,10 @@ services:
       - 8087:8087
     networks:
       - etcd_cluster_local
+    depends_on:
+      - etcd
     deploy: *x-default-deploy
     logging: *x-default-logging
+
+networks:
+  etcd_cluster_local:

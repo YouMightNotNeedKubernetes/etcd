@@ -51,4 +51,3 @@ networks:
 
 volumes:
   etcd-data:
-    name: etcd-data-{{.Task.Slot}}

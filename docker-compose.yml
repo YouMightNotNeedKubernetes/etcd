@@ -56,6 +56,12 @@ services:
       etcd_cluster_local:
     volumes:
       - etcd-data:/etcd-data
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     deploy: *x-default-deploy
     logging: *x-default-logging
 

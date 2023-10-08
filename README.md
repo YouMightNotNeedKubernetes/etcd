@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> This stack only provides initial bootstrapping of a cluster. 
+> 
+> To change cluster membership after the cluster is already running, see the runtime [reconfiguration guide][reconfiguration-guide].
+
 # etcd
 A high-availability Etcd deployment for Docker Swarm
 

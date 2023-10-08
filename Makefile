@@ -13,7 +13,7 @@ ifneq ("$(wildcard docker-compose.override.yml)","")
 endif
 
 it: env
-	@echo "make [build|deploy|destroy|scale]"
+	@echo "make [deploy|destroy|scale]"
 
 env:
 	@test -f .env || cp .env.example .env

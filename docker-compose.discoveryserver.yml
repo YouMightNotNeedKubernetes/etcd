@@ -48,6 +48,11 @@ services:
       - etcd_cluster_local
     depends_on:
       - etcd
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8087/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
     deploy: *x-default-deploy
     logging: *x-default-logging
 

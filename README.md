@@ -21,26 +21,30 @@ This guide will cover the following mechanisms for bootstrapping an etcd cluster
 
 ### Static
 
-Each of the bootstrapping mechanisms will be used to create a three machine etcd cluster with the following details:
-Name	Address	Hostname
-infra0	10.0.1.10	infra0.example.com
-infra1	10.0.1.11	infra1.example.com
-infra2	10.0.1.12	infra2.example.com
+By default, the stack will bootstrap an etcd cluster with 3 members. 
 
-As we know the cluster members, their addresses and the size of the cluster before starting, we can use an offline bootstrap configuration by setting the initial-cluster flag. Each machine will get either the following environment variables or command line:
+Here the default cluster configuration:
 
-```
-ETCD_INITIAL_CLUSTER="infra0=http://10.0.1.10:2380,infra1=http://10.0.1.11:2380,infra2=http://10.0.1.12:2380"
-ETCD_INITIAL_CLUSTER_STATE=new
-```
-```
---initial-cluster infra0=http://10.0.1.10:2380,infra1=http://10.0.1.11:2380,infra2=http://10.0.1.12:2380 \
---initial-cluster-state new
+| #   | Container Hostname | ETCD_NAME |
+| --- | ------------------ | --------- |
+| 1   | etcd-1             | etcd-1    |
+| 2   | etcd-2             | etcd-2    |
+| 3   | etcd-3             | etcd-3    |
+
+As we know the cluster members, their addresses and the size of the cluster before starting, we can use an offline bootstrap configuration by setting the initial-cluster flag. Each machine will get either the following environment variables:
+
+```sh
+ETCD_INITIAL_CLUSTER=etcd-1=http://etcd-1:2380,etcd-2=http://etcd-2:2380,etcd-3=http://etcd-3:2380
 ```
 
-Note that the URLs specified in initial-cluster are the advertised peer URLs, i.e. they should match the value of initial-advertise-peer-urls on the respective nodes.
+Note that the URLs specified in initial-cluster are the advertised peer URLs, i.e. they should match the value of `ETCD_INITIAL_ADVERTISE_PEER_URLS` on the respective nodes. The default value of `ETCD_INITIAL_ADVERTISE_PEER_URLS` is `http://etcd-{{.Task.Slot}}:2380` (e.g.: `http://etcd-1:2380`).
+
+> The `{{.Task.Slot}}` is a Docker Swarm feature that will be replaced by the task slot number. This is useful for scaling the stack to multiple nodes.
+> 
+> See https://docs.docker.com/engine/reference/commandline/service_create/#create-services-using-templates
 
 If spinning up multiple clusters (or creating and destroying a single cluster) with same configuration for testing purpose, it is highly recommended that each cluster is given a unique initial-cluster-token. By doing this, etcd can generate unique cluster IDs and member IDs for the clusters even if they otherwise have the exact same configuration. This can protect etcd from cross-cluster-interaction, which might corrupt the clusters.
+
 
 > See the [clustering static][clustering-static] documentation for more details.
 
@@ -73,12 +77,6 @@ This will create the cluster with an initial size of 3 members. If no size is sp
 ```
 ETCD_DISCOVERY=https://discovery.etcd.io/3e86b59982e49066c5d813af1c2e2579cbf573de
 ```
-
-```
---discovery https://discovery.etcd.io/3e86b59982e49066c5d813af1c2e2579cbf573de
-```
-
-Each member must have a different name flag specified or else discovery will fail due to duplicated names. Hostname or machine-id can be a good choice.
 
 This will cause each member to register itself with the discovery service and begin the cluster once all members have been registered.
 

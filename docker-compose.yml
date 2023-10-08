@@ -1,3 +1,30 @@
+x-deploy: &x-default-deploy
+  replicas: 3
+  placement:
+    max_replicas_per_node: 1
+    constraints:
+      - node.role == manager
+    preferences:
+      - spread: node.labels.etcd
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+    window: 120s
+  resources:
+    limits:
+      cpus: '0.50'
+      memory: 512M
+    reservations:
+      cpus: '0.25'
+      memory: 256M
+
+x-logging: &x-default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   etcd:
     image: quay.io/coreos/etcd:v3.5.9
@@ -10,29 +37,19 @@ services:
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_DATA_DIR=/etcd-data
-    volumes:
-      - etcd-data:/etcd-data
+    ports:
+      - 2379:2379
     networks:
       etcd:
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-      placement:
-        constraints:
-          - node.role == manager
+    volumes:
+      - etcd-data:/etcd-data
+    deploy: *x-default-deploy
+    logging: *x-default-logging
+      
 
 volumes:
   etcd-data:
+    name: etcd-data-{{.Task.Slot}}
     driver: local
     driver_opts:
       type: tmpfs

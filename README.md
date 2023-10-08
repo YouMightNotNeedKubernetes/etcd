@@ -6,6 +6,10 @@
 # etcd
 A high-availability Etcd deployment for Docker Swarm
 
+## Getting Started
+
+You should only have etcd deployed once per Docker Swarm Cluster.
+
 ## Clustering Guide
 Bootstrapping an etcd cluster: Static, etcd Discovery, and DNS Discovery
 

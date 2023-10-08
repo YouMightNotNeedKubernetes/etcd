@@ -53,7 +53,7 @@ services:
     ports:
       - 2379:2379
     networks:
-      - etcd_area_internal
+      - etcd_default
       - etcd_area_lan
     volumes:
       - etcd-data:/etcd-data
@@ -67,7 +67,7 @@ services:
     logging: *x-default-logging
 
 networks:
-  etcd_area_internal:
+  etcd_default:
 
   etcd_area_lan:
     name: etcd_area_lan

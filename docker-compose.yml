@@ -1,7 +1,7 @@
 x-deploy: &x-default-deploy
   replicas: 3
   placement:
-    max_replicas_per_node: 1
+    # max_replicas_per_node: 1
     constraints:
       - node.role == manager
     preferences:
@@ -40,20 +40,15 @@ services:
     ports:
       - 2379:2379
     networks:
-      etcd:
+      etcd_cluster_local:
     volumes:
       - etcd-data:/etcd-data
     deploy: *x-default-deploy
     logging: *x-default-logging
 
+networks:
+  etcd_cluster_local:
+
 volumes:
   etcd-data:
     name: etcd-data-{{.Task.Slot}}
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-      o: size=512m,uid=1000
-
-networks:
-  etcd:

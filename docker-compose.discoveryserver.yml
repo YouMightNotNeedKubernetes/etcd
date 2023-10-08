@@ -1,0 +1,40 @@
+x-deploy: &x-default-deploy
+  replicas: 3
+  placement:
+    max_replicas_per_node: 1
+    constraints:
+      - node.role == manager
+    preferences:
+      - spread: node.labels.etcd
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+    window: 120s
+  resources:
+    limits:
+      cpus: '0.50'
+      memory: 512M
+    reservations:
+      cpus: '0.25'
+      memory: 256M
+
+x-logging: &x-default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  discoveryserver:
+    image: youmightnotneedkubernetes/etcd-discoveryserver:main
+    environment:
+      DISC_ETCD: ${DISC_ETCD:-http://etcd:2379}
+      DISC_HOST: ${DISC_HOST:-http://localhost:8087}
+      DISC_MINAGE: ${DISC_MINAGE:-12h}
+    ports:
+      - 8087:8087
+    networks:
+      - etcd_cluster_local
+    deploy: *x-default-deploy
+    logging: *x-default-logging

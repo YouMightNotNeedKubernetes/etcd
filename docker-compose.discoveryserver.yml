@@ -45,7 +45,7 @@ services:
     ports:
       - 8087:8087
     networks:
-      - etcd_private
+      - etcd_area_internal
     depends_on:
       - etcd
     healthcheck:
@@ -57,4 +57,4 @@ services:
     logging: *x-default-logging
 
 networks:
-  etcd_private:
+  etcd_area_internal:

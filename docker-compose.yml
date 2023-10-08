@@ -45,7 +45,6 @@ services:
       - etcd-data:/etcd-data
     deploy: *x-default-deploy
     logging: *x-default-logging
-      
 
 volumes:
   etcd-data:

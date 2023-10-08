@@ -50,7 +50,7 @@ services:
       - etcd
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8087/health"]
-      interval: 5s
+      interval: 15s
       timeout: 5s
       retries: 3
     deploy: *x-default-deploy

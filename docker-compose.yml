@@ -58,7 +58,7 @@ services:
       - etcd-data:/etcd-data
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
-      interval: 10s
+      interval: 15s
       timeout: 5s
       retries: 3
       start_period: 10s

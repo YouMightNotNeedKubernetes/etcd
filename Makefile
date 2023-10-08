@@ -8,6 +8,10 @@ ifeq ($(discoveryserver),true)
 	compose_files += -c docker-compose.discoveryserver.yml
 endif
 
+ifneq ("$(wildcard docker-compose.override.yml)","")
+	compose_files += -c docker-compose.override.yml
+endif
+
 it: env
 	@echo "make [build|deploy|destroy|scale]"
 

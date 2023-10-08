@@ -1,0 +1,43 @@
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.9
+    hostname: etcd-{{.Task.Slot}}
+    env_file: .env
+    environment:
+      - ETCD_NAME=etcd-{{.Task.Slot}}
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-{{.Task.Slot}}:2380
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-{{.Task.Slot}}:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
+      - ETCD_DATA_DIR=/etcd-data
+    volumes:
+      - etcd-data:/etcd-data
+    networks:
+      etcd:
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  etcd-data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,uid=1000
+
+networks:
+  etcd:

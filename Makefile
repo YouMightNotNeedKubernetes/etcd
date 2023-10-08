@@ -8,6 +8,12 @@ ifeq ($(discoveryserver),true)
 	compose_files += -c docker-compose.discoveryserver.yml
 endif
 
+it: env
+	@echo "make [build|deploy|destroy|scale]"
+
+env:
+	@test -f .env || cp .env.example .env
+
 deploy:
 	docker stack deploy $(compose_files) $(docker_stack_name)
 

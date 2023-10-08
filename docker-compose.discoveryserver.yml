@@ -28,10 +28,7 @@ x-logging: &x-default-logging
 services:
   discoveryserver:
     image: youmightnotneedkubernetes/etcd-discoveryserver:main
-    environment:
-      DISC_ETCD: ${DISC_ETCD:-http://etcd:2379}
-      DISC_HOST: ${DISC_HOST:-http://localhost:8087}
-      DISC_MINAGE: ${DISC_MINAGE:-12h}
+    env_file: .env
     ports:
       - 8087:8087
     networks:

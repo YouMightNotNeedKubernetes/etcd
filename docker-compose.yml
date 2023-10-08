@@ -1,7 +1,7 @@
 x-deploy: &x-default-deploy
   replicas: 3
   placement:
-    # max_replicas_per_node: 1
+    max_replicas_per_node: 1
     constraints:
       - node.role == manager
     preferences:

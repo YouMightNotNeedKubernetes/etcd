@@ -10,6 +10,12 @@ A high-availability Etcd deployment for Docker Swarm
 
 You should only have etcd deployed once per Docker Swarm Cluster.
 
+You will need to create swarm-scoped overlay network called `etcd_area_lan` for Consul to communicate if you haven't already.
+
+```sh
+docker network create --scope=swarm --driver=overlay --attachable etcd_area_lan
+```
+
 ## Clustering Guide
 Bootstrapping an etcd cluster: Static, etcd Discovery, and DNS Discovery
 

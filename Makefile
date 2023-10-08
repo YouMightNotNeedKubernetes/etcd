@@ -15,6 +15,9 @@ env:
 	@test -f .env || cp .env.example .env
 
 deploy:
+	@env \
+		ETCD_REPLICAS=$(service_replicas) \
+		DISC_REPLICAS=$(service_replicas) \
 	docker stack deploy $(compose_files) $(docker_stack_name)
 
 destroy:

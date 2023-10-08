@@ -1,5 +1,5 @@
 x-deploy: &x-default-deploy
-  replicas: 3
+  replicas: ${DISC_REPLICAS:-3}
   placement:
     max_replicas_per_node: 1
     constraints:

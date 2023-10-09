@@ -57,12 +57,12 @@ services:
       - etcd_area_lan
     volumes:
       - etcd-data:/etcd-data
-    healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+    # healthcheck:
+    #   test: ["CMD", "etcdctl", "endpoint", "health"]
+    #   interval: 15s
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 10s
     deploy: *x-default-deploy
     logging: *x-default-logging
 

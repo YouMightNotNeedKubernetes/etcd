@@ -12,16 +12,13 @@ ifneq ("$(wildcard docker-compose.override.yml)","")
 	compose_files += -c docker-compose.override.yml
 endif
 
-it: env network
+it: env
 	@echo "make [deploy|destroy|scale]"
 
 env:
 	@test -f .env || cp .env.example .env
 
-network:
-	@docker network create --scope=swarm --driver=overlay --attachable etcd_area_lan || true
-
-deploy: network
+deploy:
 	@env \
 		ETCD_REPLICAS=$(service_replicas) \
 		DISC_REPLICAS=$(service_replicas) \

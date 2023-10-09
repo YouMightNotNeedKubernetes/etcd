@@ -18,6 +18,9 @@ it: env
 env:
 	@test -f .env || cp .env.example .env
 
+plan:
+	docker stack config $(compose_files)
+
 deploy:
 	@env \
 		ETCD_REPLICAS=$(service_replicas) \

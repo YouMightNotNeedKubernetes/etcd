@@ -40,7 +40,7 @@ x-logging: &x-default-logging
 
 services:
   discoveryserver:
-    image: youmightnotneedkubernetes/etcd-discoveryserver:main
+    image: ymnnk8s/etcd-discoveryserver:main
     env_file: .env
     ports:
       - 8087:8087

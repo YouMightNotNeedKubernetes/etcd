@@ -8,6 +8,7 @@ A high-availability Etcd deployment for Docker Swarm
 
 etcd is a consistent distributed key-value store. Mainly used as a separate coordination service, in distributed systems. And designed to hold small amounts of data that can fit entirely in memory.
 
+https://etcd.io/
 
 ## Getting Started
 

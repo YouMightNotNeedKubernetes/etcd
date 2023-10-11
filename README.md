@@ -6,6 +6,9 @@
 # etcd
 A high-availability Etcd deployment for Docker Swarm
 
+etcd is a consistent distributed key-value store. Mainly used as a separate coordination service, in distributed systems. And designed to hold small amounts of data that can fit entirely in memory.
+
+
 ## Getting Started
 
 You should only have etcd deployed once per Docker Swarm Cluster.
@@ -18,7 +21,7 @@ docker network create --scope=swarm --driver=overlay --attachable etcd_area_lan
 
 ## How it works
 
-etcd is a consistent distributed key-value store. Mainly used as a separate coordination service, in distributed systems. And designed to hold small amounts of data that can fit entirely in memory.
+The etcd cluster is deployed as a Docker Swarm service. Its leverages the `etcd_area_lan` network for forming the cluster.
 
 ### What is failure tolerance?
 

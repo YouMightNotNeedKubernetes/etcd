@@ -16,12 +16,38 @@ You will need to create swarm-scoped overlay network called `etcd_area_lan` for 
 docker network create --scope=swarm --driver=overlay --attachable etcd_area_lan
 ```
 
-## Clustering Guide
+## How it works
+
+etcd is a consistent distributed key-value store. Mainly used as a separate coordination service, in distributed systems. And designed to hold small amounts of data that can fit entirely in memory.
+
+### What is failure tolerance?
+
+An etcd cluster operates so long as a member quorum can be established. If quorum is lost through transient network failures (e.g., partitions), etcd automatically and safely resumes once the network recovers and restores quorum; Raft enforces cluster consistency. For power loss, etcd persists the Raft log to disk; etcd replays the log to the point of failure and resumes cluster participation. For permanent hardware failure, the node may be removed from the cluster through [runtime reconfiguration](https://etcd.io/docs/v3.5/op-guide/runtime-configuration/).
+
+It is recommended to have an odd number of members in a cluster. An odd-size cluster tolerates the same number of failures as an even-size cluster but with fewer nodes. The difference can be seen by comparing even and odd sized clusters:
+
+| Cluster Size | Majority | Failure Tolerance |
+| ------------ | -------- | ----------------- |
+| 1            | 1        | 0                 |
+| 2            | 2        | 0                 |
+| 3            | 2        | 1                 |
+| 4            | 3        | 1                 |
+| 5            | 3        | 2                 |
+| 6            | 4        | 2                 |
+| 7            | 4        | 3                 |
+| 8            | 5        | 3                 |
+| 9            | 5        | 4                 |
+
+Adding a member to bring the size of cluster up to an even number doesn’t buy additional fault tolerance. Likewise, during a network partition, an odd number of members guarantees that there will always be a majority partition that can continue to operate and be the source of truth when the partition ends.
+
+> See https://etcd.io/docs/ for more information.
+
+### Clustering Guide
 Bootstrapping an etcd cluster: Static, etcd Discovery, and DNS Discovery
 
 See: https://etcd.io/docs/v3.5/op-guide/clustering/
 
-### Overview
+#### Overview
 
 Starting an etcd cluster statically requires that each member knows another in the cluster. In a number of cases, the IPs of the cluster members may be unknown ahead of time. In these cases, the etcd cluster can be bootstrapped with the help of a discovery service.
 
@@ -29,7 +55,7 @@ This guide will cover the following mechanisms for bootstrapping an etcd cluster
 - Static
 - etcd Discovery
 
-### Static
+#### Static
 
 By default, the stack will bootstrap an etcd cluster with 3 members. 
 
@@ -58,7 +84,7 @@ If spinning up multiple clusters (or creating and destroying a single cluster) w
 
 > See the [clustering static][clustering-static] documentation for more details.
 
-## Discovery
+### Discovery
 
 In a number of cases, the IPs of the cluster peers may not be known ahead of time. This is common when utilizing cloud providers or when the network uses DHCP. In these cases, rather than specifying a static configuration, use an existing etcd cluster to bootstrap a new one. This process is called “discovery”.
 
@@ -66,15 +92,15 @@ There two methods that can be used for discovery:
 - etcd discovery service
 - DNS SRV records (Will not be covered in this guide)
 
-### etcd discovery
+#### etcd discovery
 To better understand the design of the discovery service protocol, we suggest reading the [discovery service protocol][discovery-service-protocol] documentation.
 
-#### Lifetime of a discovery URL 
+##### Lifetime of a discovery URL 
 A discovery URL identifies a unique etcd cluster. Instead of reusing an existing discovery URL, each etcd instance shares a new discovery URL to bootstrap the new cluster.
 
 Moreover, discovery URLs should ONLY be used for the initial bootstrapping of a cluster. To change cluster membership after the cluster is already running, see the runtime [reconfiguration guide][reconfiguration-guide].
 
-#### Public etcd discovery service
+##### Public etcd discovery service
 If no exiting cluster is available, use the public discovery service hosted at discovery.etcd.io. To create a private discovery URL using the “new” endpoint, use the command:
 
 ```sh
@@ -97,3 +123,53 @@ This will cause each member to register itself with the discovery service and be
 [reconfiguration-guide]: https://etcd.io/docs/v3.5/op-guide/runtime-configuration/
 [clustering-static]: https://etcd.io/docs/v3.5/op-guide/clustering/#static
 [clustering-discovery]: https://etcd.io/docs/v3.5/op-guide/clustering/#discovery
+
+### Server placement
+
+A `node.labels.etcd` label is used to determine which nodes the service can be deployed on.
+
+The deployment uses both placement **constraints** & **preferences** to ensure that the servers are spread evenly across the Docker Swarm manager nodes and only **ALLOW** one replica per node.
+
+![placement_prefs](https://docs.docker.com/engine/swarm/images/placement_prefs.png)
+
+> See https://docs.docker.com/engine/swarm/services/#control-service-placement for more information.
+
+#### List the nodes
+On the manager node, run the following command to list the nodes in the cluster.
+
+```sh
+docker node ls
+```
+
+#### Add the label to the node
+On the manager node, run the following command to add the label to the node.
+
+Repeat this step for each node you want to deploy the service to. Make sure that the number of node updated matches the number of replicas you want to deploy.
+
+**Example deploy service with 3 replicas**:
+```sh
+docker node update --label-add etcd=true <node-1>
+docker node update --label-add etcd=true <node-2>
+docker node update --label-add etcd=true <node-3>
+```
+
+## Deployment
+
+To deploy the stack, run the following command:
+
+```sh
+$ make deploy
+```
+
+Or to deploy a self-hosted discovery server:
+```sh
+$ make deploy disoveryserver=true
+```
+
+## Destroy
+
+To destroy the stack, run the following command:
+
+```sh
+$ make destroy
+```

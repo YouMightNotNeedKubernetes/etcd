@@ -40,7 +40,7 @@ x-logging: &x-default-logging
 
 services:
   etcd:
-    image: quay.io/coreos/etcd:v3.5.9
+    image: gcr.io/etcd-development/etcd:v3.5.9
     hostname: etcd-{{.Task.Slot}}
     env_file: .env
     environment:

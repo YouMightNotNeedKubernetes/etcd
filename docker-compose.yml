@@ -4,6 +4,7 @@ x-deploy: &x-default-deploy
     max_replicas_per_node: 1
     constraints:
       - node.role == manager
+      - node.labels.etcd == true
     preferences:
       - spread: node.labels.etcd
   restart_policy:
@@ -56,12 +57,6 @@ services:
       - etcd_area_lan
     volumes:
       - etcd:/etcd-data
-    # healthcheck:
-    #   test: ["CMD", "etcdctl", "endpoint", "health"]
-    #   interval: 15s
-    #   timeout: 5s
-    #   retries: 3
-    #   start_period: 10s
     deploy: *x-default-deploy
     logging: *x-default-logging
 

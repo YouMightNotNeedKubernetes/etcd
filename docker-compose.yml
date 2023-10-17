@@ -55,7 +55,7 @@ services:
     networks:
       - etcd_area_lan
     volumes:
-      - etcd-data:/etcd-data
+      - etcd:/etcd-data
     # healthcheck:
     #   test: ["CMD", "etcdctl", "endpoint", "health"]
     #   interval: 15s
@@ -71,4 +71,6 @@ networks:
     external: true
 
 volumes:
-  etcd-data:
+  etcd:
+    name: etcd
+    external: true

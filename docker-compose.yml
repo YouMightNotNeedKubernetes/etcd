@@ -63,7 +63,7 @@ services:
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_DATA_DIR=/etcd-data
     ports:
-      - ${ETCD_PORT:-2379}:2379
+      - 2379:2379
     networks:
       - etcd_area_lan
     volumes:

@@ -39,10 +39,18 @@ x-logging: &x-default-logging
     max-size: "10m"
     max-file: "3"
 
+networks:
+  etcd_area_lan:
+    name: etcd_area_lan
+    external: true
+
+volumes:
+  etcd:
+    external: true
+
 services:
   etcd:
-    image: gcr.io/etcd-development/etcd:v3.5.9
-    # image: quay.io/coreos/etcd:v3.5.9
+    image: gcr.io/etcd-development/etcd:${ETCD_VERSION:?ETCD_VERSION env is not set}
     hostname: etcd-{{.Task.Slot}}
     env_file: .env
     environment:
@@ -55,20 +63,10 @@ services:
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_DATA_DIR=/etcd-data
     ports:
-      - 2379:2379
+      - ${ETCD_PORT:-2379}:2379
     networks:
       - etcd_area_lan
     volumes:
       - etcd:/etcd-data
     deploy: *x-default-deploy
     logging: *x-default-logging
-
-networks:
-  etcd_area_lan:
-    name: etcd_area_lan
-    external: true
-
-volumes:
-  etcd:
-    name: etcd
-    external: true
